@@ -1,0 +1,272 @@
+{% extends "layout.html" %}
+
+{% block title %}Clients Table{% endblock %}
+
+{% block content %}
+{# Parse the storage string (e.g., "60/128") #}
+{% set storage_values = client.storage.split('/') %}
+{% set used_storage = storage_values[0] | int %}
+{% set total_storage = storage_values[1] | int %}
+{% set storage_percent = (used_storage / total_storage * 100) | round %}
+
+<div class="container mt-4">
+  <!-- Header Row: Client Info and Storage -->
+  <div class="row mb-4">
+    <!-- Client Info -->
+    <div class="col-md-8">
+      <div class="jumbotron text-dark">
+        <h1 class="display-4">
+          {{ client.nickname or client.mac_address }}
+          {% if client.shutdown %}
+            <span class="text-danger">
+              <i class="zmdi zmdi-close-circle" style="font-size: 1.2em;"></i>
+            </span>
+          {% else %}
+            <span class="text-success">
+              <i class="zmdi zmdi-check-circle" style="font-size: 1.2em;"></i>
+            </span>
+          {% endif %}
+        </h1>
+      </div>
+    </div>
+    <!-- Storage Thermometer -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Storage</h5>
+          <div class="progress" style="height: 20px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ storage_percent }}%;"
+                 aria-valuenow="{{ storage_percent }}" aria-valuemin="0" aria-valuemax="100">
+              {{ used_storage }}GB
+            </div>
+          </div>
+          <small class="text-muted">{{ used_storage }}GB used of {{ total_storage }}GB</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Information Card -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <!-- Card Header with Icon -->
+        <div class="card-header bg-dark-blue text-off-white">
+          <i class="zmdi zmdi-info" style="margin-right: 5px;"></i> System Information
+        </div>
+        <!-- Card Body using List Group -->
+        <ul class="list-group list-group-flush">
+          <!-- Current User -->
+          <li class="list-group-item">
+            <h6 class="mb-1">
+              <i class="zmdi zmdi-account" style="margin-right: 5px;"></i>
+              Current User
+            </h6>
+            <p class="mb-0">{{ client.current_user or "N/A" }}</p>
+          </li>
+          <!-- Windows Version -->
+          <li class="list-group-item">
+            <h6 class="mb-1">
+              <i class="zmdi zmdi-windows" style="margin-right: 5px;"></i>
+              Operating System
+            </h6>
+            <p class="mb-0">Windows {{ client.windows_version or "N/A" }} ({{ client.windows_version_number }})</p>
+          </li>
+          <!-- Firewall Status -->
+          <li class="list-group-item">
+            <h6 class="mb-1">
+              <i class="zmdi zmdi-shield-security" style="margin-right: 5px;"></i>
+              Firewall Status
+            </h6>
+            <div class="d-flex flex-wrap" style="gap: 1rem;">
+              <div>
+                <strong>Domain:</strong>
+                <span class="{{ 'text-success' if client.firewall_status.Domain else 'text-danger' }}">
+                  {{ 'Active' if client.firewall_status.Domain else 'Disabled' }}
+                </span>
+              </div>
+              <div>
+                <strong>Private:</strong>
+                <span class="{{ 'text-success' if client.firewall_status.Private else 'text-danger' }}">
+                  {{ 'Active' if client.firewall_status.Private else 'Disabled' }}
+                </span>
+              </div>
+              <div>
+                <strong>Public:</strong>
+                <span class="{{ 'text-success' if client.firewall_status.Public else 'text-danger' }}">
+                  {{ 'Active' if client.firewall_status.Public else 'Disabled' }}
+                </span>
+              </div>
+            </div>
+          </li>
+          <!-- Bitlocker Status -->
+          <li class="list-group-item">
+            <h6 class="mb-1">
+              <i class="zmdi zmdi-lock" style="margin-right: 5px;"></i>
+              Bitlocker Status
+            </h6>
+            {% if client.bitlocker_status %}
+              {% for drive in client.bitlocker_status %}
+                <div class="mb-2">
+                  <strong>{{ drive.DeviceID }}</strong>:
+                  <span class="mr-3">
+                    <em>Protection:</em>
+                    {% if drive.ProtectionStatus == "On (Protected)" %}
+                      <span class="text-success">{{ drive.ProtectionStatus }}</span>
+                    {% else %}
+                      <span class="text-danger">{{ drive.ProtectionStatus }}</span>
+                    {% endif %}
+                  </span>
+                  {% if drive.ProtectionStatus == "On (Protected)" %}
+                    <span>
+                      <em>Encryption:</em> {{ drive.EncryptionMethod }}
+                    </span>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="mb-0">
+                <span class="text-muted">No Bitlocker data available.</span>
+              </p>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content: Controls and Programs -->
+  <div class="row">
+    <!-- Left: Controls -->
+    <div class="col-md-4">
+      <!-- Install Software -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-dark-blue text-off-white">
+          Install Software
+        </div>
+        <div class="card-body">
+          <form id="install-software-form">
+            <div class="input-group">
+              <input type="text" class="form-control" id="software-name" placeholder="Enter software name" required>
+              <button type="button" class="btn btn-primary" id="install-button">Install</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- Actions -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-dark-blue text-off-white">
+          Actions
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-around">
+            <button type="button" title="Shutdown"
+                    class="btn btn-outline-secondary {% if client.shutdown %}disabled-button{% endif %}"
+                    id="shutdown-button" {% if client.shutdown %}disabled{% endif %}>
+              <i class="zmdi zmdi-power" style="font-size: 28px;"></i>
+            </button>
+            <button type="button"
+                    class="btn btn-outline-secondary {% if client.shutdown %}disabled-button{% endif %}"
+                    id="upgrades_button" {% if client.shutdown %}disabled{% endif %}>
+              <i class="zmdi zmdi-refresh-alt" style="font-size: 28px;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Right: Installed Programs Table -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark-blue text-off-white">
+          Installed Programs
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-borderless mb-0">
+              <thead class="bg-dark-blue text-off-white">
+                <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Current Version</th>
+                  <th>Latest Version</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody class="text-dark-blue">
+                {% if programs %}
+                  {% for installedProgram in programs %}
+                    <tr>
+                      <td></td>
+                      <td>{{ installedProgram.name or "N/A" }}</td>
+                      <td>{{ installedProgram.current_version or "N/A" }}</td>
+                      <td>{{ installedProgram.available_version or "N/A" }}</td>
+                      <td>
+                        {% if installedProgram.available_version %}
+                          <a class="btn btn-primary btn-sm" id="installation-button" href="#">
+                            Upgrade
+                          </a>
+                        {% else %}
+                          <span class="text-muted">Up to date</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="5" class="text-center text-muted">
+                      No installed programs available.
+                    </td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript Handlers -->
+<script>
+  // Shutdown button handler
+  document.getElementById('shutdown-button').addEventListener('click', function() {
+    fetch('/api/clients/shutdown', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 'mac': '{{ client.mac_address }}' })
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+  });
+
+  // Install software button handler
+  document.getElementById('install-button').addEventListener('click', function () {
+    const softwareName = document.getElementById('software-name').value;
+    if (!softwareName) {
+      alert('Please enter a software name.');
+      return;
+    }
+    fetch('/api/clients/install', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 'software': softwareName })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert(`Software installation initiated: ${softwareName}`);
+      console.log(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to install software. Please try again.');
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<style>
+  /* Change the background of table rows on hover */
+  .table-borderless tbody tr:hover {
+    background-color: #dcdcdc; /* Adjust this color to fit your design */
+  }
+</style>
+
+<div class="container mt-4">
+  <!-- Dashboard Header -->
+  <div class="row">
+    <div class="col-12">
+      <div class="jumbotron text-dark mb-4">
+        <h1 class="display-4">Dashboard</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Row -->
+  <div class="row">
+    <!-- Left Column: Summary & Actions -->
+    <div class="col-md-4">
+      <!-- Devices Connected Card -->
+      <div class="card shadow mb-4 bg-off-white">
+        <div class="card-body text-center">
+          <h5 class="card-title">Devices Connected</h5>
+          <p class="card-text" style="font-size: 70px;">{{ online_client_count }}</p>
+        </div>
+      </div>
+
+      <!-- Install Software Card -->
+      <div class="card shadow mb-4 bg-off-white">
+        <div class="card-body">
+          <h5 class="card-title">Install Software</h5>
+          <form id="install-software-form">
+            <div class="input-group">
+              <input type="text" autocomplete="off" class="form-control" id="software-name" placeholder="Enter software name" required>
+              <button type="button" class="btn btn-primary" id="install-button">Install</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Actions Card -->
+      <div class="card shadow mb-4 bg-off-white">
+        <div class="card-body">
+          <h5 class="card-title">Actions</h5>
+          <hr class="mb-3">
+          <div class="row text-center mt-3">
+            <div class="col-4">
+              <button type="button" title="Shutdown" class="btn btn-outline-secondary" id="shutdown-button">
+                <i class="zmdi zmdi-power" style="font-size: 30px;"></i>
+              </button>
+              <p style="font-size: 12px; margin-top: 5px;">Shutdown</p>
+            </div>
+            <div class="col-4">
+              <button type="button" class="btn btn-outline-secondary" id="upgrades-button">
+                <i class="zmdi zmdi-refresh-alt" style="font-size: 30px;"></i>
+              </button>
+              <p style="font-size: 12px; margin-top: 5px;">Scan Updates</p>
+            </div>
+            <div class="col-4">
+              <button type="button" class="btn btn-outline-secondary" id="upgrade-button">
+                <i class="zmdi zmdi-cloud-upload" style="font-size: 30px;"></i>
+              </button>
+              <p style="font-size: 12px; margin-top: 5px;">Update</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Devices Table -->
+    <div class="col-md-8">
+      <div class="card shadow bg-off-white mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Devices</h5>
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <thead>
+                <tr>
+                  <th scope="col">Device Name</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Logged In User</th>
+                  <th scope="col">Storage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for client in clients %}
+                <tr style="cursor: pointer;" onclick="window.location='/clients/{{ client.mac_address }}'">
+                  <td>{{ client.nickname or client.mac_address }}</td>
+                  {% if client.shutdown %}
+                  <td>
+                    <i class="zmdi zmdi-close-circle" style="font-size: 1.2em; color: #ff4d4d;"></i> Offline
+                  </td>
+                  {% else %}
+                  <td>
+                    <i class="zmdi zmdi-check-circle" style="font-size: 1.2em; color: #00cc00;"></i> Online
+                  </td>
+                  {% endif %}
+                  <td>
+                    {{ client.current_user or "N/A" }}
+                  </td>
+                  <td>
+                    {% if client.storage %}
+                      {% set storage_values = client.storage.split('/') %}
+                      {% set used_storage = storage_values[0] | int %}
+                      {% set total_storage = storage_values[1] | int %}
+                      {% set storage_percent = (used_storage / total_storage * 100) | round %}
+                      <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ storage_percent }}%;" aria-valuenow="{{ storage_percent }}" aria-valuemin="0" aria-valuemax="100">
+                          {{ used_storage }}GB
+                        </div>
+                      </div>
+                      <small class="text-muted">{{ used_storage }}GB used of {{ total_storage }}GB</small>
+                    {% else %}
+                      <span>N/A</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript Handlers -->
+<script>
+  document.getElementById('shutdown-button').addEventListener('click', function() {
+    fetch('/api/clients/shutdown', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+  });
+
+  document.getElementById('upgrades-button').addEventListener('click', function() {
+    fetch('/api/clients/upgrades', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+  });
+
+  document.getElementById('upgrade-button').addEventListener('click', function() {
+    fetch('/api/clients/upgrade', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+  });
+
+  document.getElementById('install-button').addEventListener('click', function() {
+    const softwareName = document.getElementById('software-name').value;
+    if (!softwareName) {
+      alert('Please enter a software name.');
+      return;
+    }
+    fetch('/api/clients/install', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 'software': softwareName })
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      alert(`Software installation initiated: ${softwareName}`);
+      console.log(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to install software. Please try again.');
+    });
+  });
+</script>
+{% endblock %}

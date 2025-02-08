@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="jumbotron text-dark">
+            <h1 class="display-4">Settings</h1>
+            <br>
+            <br>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Automation Rules Card -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <!-- Icon and Title in a flex container -->
+                    <div class="d-flex align-items-center">
+                        <h5 class="card-title mb-0">Automation Rules</h5>
+                    </div>
+                    <hr>
+                    <p class="card-text">
+                        Manage and configure your automation rules to streamline workflows and increase efficiency.
+                    </p>
+                    <a href="/rules" class="btn btn-primary">Configure</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <!-- Icon and Title in a flex container -->
+                    <div class="d-flex align-items-center">
+                        <h5 class="card-title mb-0">Default Apps</h5>
+                    </div>
+                    <hr>
+                    <p class="card-text">
+                        Manage and configure the default apps installed when you add a new computer.
+                    </p>
+                    <a href="/default-apps" class="btn btn-primary">Configure</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

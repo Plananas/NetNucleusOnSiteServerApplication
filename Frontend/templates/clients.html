@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="jumbotron text-dark">
+        <h1 class="display-4">Clients</h1>
+        <p class="lead">Manage your connected clients easily.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clients Grid -->
+  <div class="row">
+    {% for client in clients %}
+      <div class="col-md-4 col-sm-6 mb-4">
+        <a href="/clients/{{ client.mac_address }}" class="text-decoration-none">
+          <div class="card hover-button bg-off-white shadow-sm">
+            <div class="card-body text-center">
+              <h5 class="card-title">{{ client.nickname or client.mac_address }}</h5>
+              {% if client.shutdown %}
+                <span class="badge" style="font-size: 1.1em; background-color: #ff4d4d; color: #fff;">Offline</span>
+              {% else %}
+                <span class="badge badge-success" style="font-size: 1.1em; background-color: #00cc00;">Online</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </div>
+    {% else %}
+      <div class="col-12">
+        <p class="text-muted text-center">No clients available.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

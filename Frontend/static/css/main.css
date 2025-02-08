@@ -1,0 +1,172 @@
+/* Define color variables for consistency */
+:root {
+  --off-white: #ECECE3;
+  --dark-off-white: #F5EDE0;
+  --dark-blue: #18252F;
+  --orange: #CA5213;
+}
+
+/* Generic Containers and Cards */
+.clients-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.client-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--off-white);
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  width: 200px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.client-image {
+  width: 50px;
+  height: 50px;
+  margin-right: 15px;
+}
+
+.client-info p {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+/* Background Colors */
+.bg-off-white { background-color: var(--off-white); }
+.bg-dark-off-white { background-color: var(--dark-off-white); }
+.bg-dark-blue { background-color: var(--dark-blue); }
+.bg-orange { background-color: var(--orange); }
+
+/* Text Colors */
+.text-off-white { color: var(--off-white); }
+.text-dark-off-white { color: var(--dark-off-white); }
+.text-dark-blue { color: var(--dark-blue); }
+.text-orange { color: var(--orange); }
+
+/* Card Hover Effects */
+.card.hover-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+/* Navigation Cards */
+.card-nav-body h5 {
+  margin: 0;
+  line-height: 1;
+}
+
+.card-nav-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.card-nav.hover-button {
+  width: 80px;
+  height: 80px;
+  margin: 30px auto;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 3px;
+}
+
+.card-nav.hover-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+a.card-nav, .card-client {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Disabled Button Style */
+.disabled-button {
+  background-color: #e0e0e0 !important;
+  color: #a0a0a0 !important;
+  cursor: not-allowed;
+}
+
+/* Table Styles */
+.table-borderless > :not(caption) > * > * {
+  background-color: var(--off-white);
+}
+
+.table-bordered thead th {
+  color: var(--off-white);
+  background-color: var(--dark-blue);
+  font-weight: bold;
+}
+
+.table-bordered tbody tr {
+  background-color: var(--off-white);
+  color: var(--dark-blue);
+  border-top: 1px solid var(--orange);
+}
+
+.table-bordered tbody tr:hover {
+  background-color: var(--dark-off-white);
+}
+
+/* Button Overrides for Primary Buttons */
+.btn-primary {
+  --bs-btn-color: var(--off-white);
+  --bs-btn-bg: var(--orange);
+  --bs-btn-border-color: var(--orange);
+  --bs-btn-hover-color: var(--off-white);
+  --bs-btn-hover-bg: #A64210;
+  --bs-btn-hover-border-color: #A64210;
+  --bs-btn-focus-shadow-rgb: 202, 82, 19;
+  --bs-btn-active-color: var(--off-white);
+  --bs-btn-active-bg: #7A310C;
+  --bs-btn-active-border-color: #7A310C;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: var(--off-white);
+  --bs-btn-disabled-bg: var(--dark-off-white);
+  --bs-btn-disabled-border-color: var(--dark-off-white);
+}
+
+/* Optional: Adjust card-button sizes if using them elsewhere */
+.card-button {
+  display: inline-block;
+  height: 110px;
+  width: 140px;
+  margin: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: center;
+  vertical-align: top;
+}
+/* Style adjustments for the System Information card */
+.card-header i {
+  vertical-align: middle;
+}
+
+.list-group-item h6 {
+  font-weight: bold;
+  color: var(--dark-blue);
+}
+
+.list-group-item p {
+  font-size: 0.95rem;
+  color: var(--dark-blue);
+}
+
+.list-group-item div > div {
+  font-size: 0.9rem;
+  color: var(--dark-blue);
+}
