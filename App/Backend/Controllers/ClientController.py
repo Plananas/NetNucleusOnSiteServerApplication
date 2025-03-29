@@ -5,8 +5,8 @@ import secrets
 from flask import jsonify, request, redirect, url_for, g
 from flask import Blueprint, render_template
 
-from OnSiteServerApplication.Backend.App.Repositories.ClientRepository import ClientRepository
-from OnSiteServerApplication.Backend.App.Repositories.ProgramRepository import ProgramRepository
+from App.Backend.Repositories.ClientRepository import ClientRepository
+from App.Backend.Repositories.ProgramRepository import ProgramRepository
 
 
 class ClientController:

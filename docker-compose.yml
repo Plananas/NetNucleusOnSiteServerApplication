@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  onsite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    stop_signal: SIGINT
+    ports:
+      - '5001:5000'
+    networks:
+      app-network:
+        aliases:
+          - onsite.local
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,6 +1,6 @@
 from typing import List
 
-from OnSiteServerApplication.Backend.App.Models.ProgramModel import ProgramModel
+from App.Backend.Models.ProgramModel import ProgramModel
 
 
 class ProgramRepository:
