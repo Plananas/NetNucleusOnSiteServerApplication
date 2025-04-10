@@ -12,7 +12,7 @@ class ProgramRepository:
         program.save()
 
     @staticmethod
-    def get_program_by_client_id(client_uuid: str) -> List[ProgramModel]:
+    def get_program_by_client_uuid(client_uuid: str) -> List[ProgramModel]:
         """Retrieve a program by client id."""
         print(client_uuid)
 
@@ -20,7 +20,7 @@ class ProgramRepository:
 
 
     @staticmethod
-    def get_program_by_client_id_and_name(client_uuid: str, name: str,) -> List[ProgramModel]:
+    def get_program_by_client_uuid_and_name(client_uuid: str, name: str,) -> List[ProgramModel]:
         """Retrieve a program by client id."""
 
         return ProgramModel.get(client_uuid=client_uuid, name=name)

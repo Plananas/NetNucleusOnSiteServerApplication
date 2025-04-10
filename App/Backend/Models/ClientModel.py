@@ -44,7 +44,7 @@ class ClientModel(Model):
 
     def get_installed_programs(self) -> List[ProgramModel]:
         program_repository = ProgramRepository()
-        installed_programs = program_repository.get_program_by_client_id(self.uuid)
+        installed_programs = program_repository.get_program_by_client_uuid(self.uuid)
 
         return installed_programs
 

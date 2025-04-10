@@ -1,22 +1,28 @@
+# Use a Windows Server Core base image
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
-FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
+# Use PowerShell as the shell
+SHELL ["powershell", "-Command"]
 
+# Set working directory
 WORKDIR /App
 
-COPY requirements.txt .
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python3 -m pip install --upgrade pip && \
-    python3 -m pip install -r requirements.txt
+# Install Scoop
+RUN Set-ExecutionPolicy RemoteSigned -Scope Process -Force; \
+    iwr -useb get.scoop.sh | iex
 
+# Install Python via Scoop
+RUN scoop install python
 
+# Add Python to PATH
+ENV PATH="C:\\Users\\ContainerUser\\scoop\\apps\\python\\current;${PATH}"
+
+# Copy app files
 COPY . .
 
-CMD ["python3", "-m", "App"]
+# Install Python dependencies
+RUN pip install --upgrade pip; \
+    pip install -r requirements.txt
 
-
-FROM builder as dev-envs
-
-# Install additional packages for development
-RUN apk update && apk add git
-
-RUN addgroup -S docker && adduser -S --shell /bin/bash --ingroup docker vscode
+# Run the application
+CMD ["python", "-m", "App"]

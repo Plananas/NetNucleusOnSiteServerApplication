@@ -14,8 +14,8 @@ class ClientController:
     main = Blueprint(
         "main",
         __name__,
-        static_folder="Frontend/static",
-        template_folder="frontend/templates"
+        static_folder="static",
+        template_folder="templates"
     )
 
 
@@ -46,6 +46,12 @@ class ClientController:
             'do_login',
             self.do_login,
             methods=['POST'])
+        self.main.add_url_rule(
+            '/admin/command',
+            'admin_command',
+            self.send_command,
+            methods=['POST']
+        )
 
         self.lock = threading.Lock()
         self.server = server
@@ -55,7 +61,7 @@ class ClientController:
         @self.main.before_request
         def check_login():
             print("check_login")
-            if request.endpoint not in ['main.login', 'main.do_login', 'static']:
+            if request.endpoint not in ['main.login', 'main.do_login', 'static', 'main.admin_command']:
                 login_token = request.cookies.get('login')
                 if not login_token or login_token not in self.session_store:
                     return redirect(url_for('main.login'))
@@ -64,6 +70,21 @@ class ClientController:
 
     def getBlueprint(self):
         return self.main
+
+
+    def send_command(self):
+        if request.remote_addr != '127.0.0.1':
+            return jsonify({"error": "Unauthorized"}), 403
+
+        data = request.get_json()
+        message = data.get("message")
+
+        if not message:
+            return jsonify({"error": "No message provided"}), 400
+
+        result = self.server.enter_command(message)
+        return jsonify({"response": result}), 200
+
 
 
     @staticmethod
@@ -82,7 +103,8 @@ class ClientController:
             self.session_store[unique_token] = username  # Save the token associated with the user
 
             response = redirect(url_for('main.home'))
-            response.set_cookie('login', unique_token, max_age=3600, httponly=True, secure=True)  # Secure cookie settings
+            #FIXME this is set to insecure http for dev environments only!
+            response.set_cookie('login', unique_token, max_age=3600, httponly=True, secure=False)  # Secure cookie settings
             return response
         else:
             return redirect(url_for('main.login', login_failed='true'))

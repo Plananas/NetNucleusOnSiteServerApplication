@@ -4,6 +4,7 @@ from typing import List, Optional
 import re
 import threading
 import time
+import os
 
 from App.Backend.Models.MessageHandler import MessageHandler
 from App.Backend.Repositories.ClientRepository import ClientRepository
@@ -12,14 +13,14 @@ from App.Backend.Server.ClientHandler import ClientHandler
 
 
 class ServerProcess:
-    PORT = 50000
+    PORT = int(os.getenv("SOCKET_PORT", 50000))
 
     def __init__(self):
         #just to check
         self.id =  random.randint(1,1000)
         print("serverprocess is created", self.id)
         self.client_controller = None
-        self.SERVER = socket.gethostbyname(socket.gethostname())
+        self.SERVER = "0.0.0.0"
         self.ADDR = (self.SERVER, self.PORT)
         self.active_connections = 0
         self.client_handlers: List[ClientHandler] = []
