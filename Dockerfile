@@ -1,28 +1,34 @@
-# Use a Windows Server Core base image
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
-# Use PowerShell as the shell
-SHELL ["powershell", "-Command"]
+SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-Command"]
 
-# Set working directory
-WORKDIR /App
+ENV SCOOP='C:\\scoop'
+ENV SCOOP_GLOBAL='C:\\scoop'
+ENV PYTHON_HOME='C:\\Python310'
+ENV PATH='C:\\scoop\\shims;C:\\scoop\\apps\\scoop\\current\\bin;C:\\Python310;C:\\Python310\\Scripts;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem'
 
 # Install Scoop
 RUN Set-ExecutionPolicy RemoteSigned -Scope Process -Force; \
-    iwr -useb get.scoop.sh | iex
+    New-Item -ItemType Directory -Force -Path $env:SCOOP; \
+    Invoke-WebRequest -Uri "https://get.scoop.sh" -OutFile "install-scoop.ps1"; \
+    .\install-scoop.ps1 -RunAsAdmin; \
+    Remove-Item "install-scoop.ps1"
 
-# Install Python via Scoop
-RUN scoop install python
+# Install Python 3.10
+RUN Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.10.11/python-3.10.11-amd64.exe" -OutFile "python-installer.exe"; \
+    Start-Process -FilePath "python-installer.exe" -ArgumentList '/quiet', 'InstallAllUsers=1', 'TargetDir=C:\\Python310', 'PrependPath=0' -Wait; \
+    Remove-Item "python-installer.exe"
 
-# Add Python to PATH
-ENV PATH="C:\\Users\\ContainerUser\\scoop\\apps\\python\\current;${PATH}"
+ENV PYTHON_HOME="C:\\Python310"
+ENV PATH="${PATH};C:\\Python310;C:\\Python310\\Scripts"
 
-# Copy app files
+RUN python --version; pip --version
+
+
+WORKDIR /App
+
 COPY . .
 
-# Install Python dependencies
-RUN pip install --upgrade pip; \
-    pip install -r requirements.txt
+RUN C:\Python310\Scripts\pip.exe install --upgrade pip; C:\Python310\Scripts\pip.exe install -r requirements.txt
 
-# Run the application
-CMD ["python", "-m", "App"]
+CMD ["C:\\Python310\\python.exe", "-m", "App"]

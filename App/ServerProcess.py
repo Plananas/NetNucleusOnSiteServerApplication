@@ -13,7 +13,7 @@ from App.Backend.Server.ClientHandler import ClientHandler
 
 
 class ServerProcess:
-    PORT = int(os.getenv("SOCKET_PORT", 50000))
+    PORT = int(os.getenv("SOCKET_PORT", 8000))
 
     def __init__(self):
         #just to check

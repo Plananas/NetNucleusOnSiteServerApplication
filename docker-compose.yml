@@ -5,16 +5,8 @@ services:
       dockerfile: Dockerfile
     stop_signal: SIGINT
     ports:
-      - '5001:5000'       # Flask port
-      - '50000:50000'     # Socket port
-    networks:
-      app-network:
-        aliases:
-          - onsite.local
+      - "80:80"
+      - "8000"
     stdin_open: true
     tty: true
     isolation: process
-
-networks:
-  app-network:
-    driver: nat

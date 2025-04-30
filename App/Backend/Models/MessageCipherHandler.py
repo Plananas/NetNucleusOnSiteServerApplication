@@ -27,6 +27,7 @@ class MessageCipherHandler:
         try:
             peer_key = int.from_bytes(base64.b64decode(key), byteorder='big')
             self.shared_encryption_key = self._compute_shared_key(peer_key)
+            # print(self.shared_encryption_key)
         except (ValueError, TypeError) as e:
             raise ValueError(f"Invalid peer public key: {e}")
 
@@ -62,12 +63,14 @@ class MessageCipherHandler:
             nonce = base64.b64decode(b64_nonce)
             ciphertext = base64.b64decode(b64_ciphertext)
             tag = base64.b64decode(b64_tag)
+            print(ciphertext)
 
             # Create the AES cipher with the shared encryption key and nonce
             cipher = AES.new(self.shared_encryption_key, AES.MODE_EAX, nonce=nonce)
 
             # Decrypt and verify
             plaintext = cipher.decrypt(ciphertext)
+            print(plaintext)
             cipher.verify(tag)
             return plaintext.decode('utf-8')
 

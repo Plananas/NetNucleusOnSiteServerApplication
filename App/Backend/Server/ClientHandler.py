@@ -221,7 +221,7 @@ class ClientHandler:
 
     def save_programs(self, client_uuid, installed_software):
         program_repository = ProgramRepository()
-        existing_program = program_repository.get_program_by_client_id(client_uuid)
+        existing_program = program_repository.get_program_by_client_uuid(client_uuid)
         if existing_program:
             for program in existing_program:
             #The program should already exist if it had a version so we delete it
@@ -232,7 +232,7 @@ class ClientHandler:
 
     def save_program(self, client_uuid, program):
         program_repository = ProgramRepository()
-        existing_program = program_repository.get_program_by_client_id_and_name(client_uuid, program["name"])
+        existing_program = program_repository.get_program_by_client_uuid_and_name(client_uuid, program["name"])
 
         if existing_program:
             #The program should already exist if it had a version so we delete it
